@@ -4,7 +4,11 @@ import streamlit as st
 
 # Função para exibir as perguntas com as opções
 def display_question(question):
-    st.subheader(f"Q{question['question_number']}: {question['question']}")
+    # Concatenar a pergunta, número e descrição
+    question_text = f"**Q{question['question_number']}:** {question['question']}"
+    
+    # Exibir a pergunta e a descrição no mesmo bloco com o mesmo estilo
+    st.markdown(question_text)
     
     # Exibir as opções
     for option in question['options']:
@@ -23,7 +27,7 @@ def display_answer(question):
 
 # Função principal para criar a interface com Streamlit
 def main():
-    st.title("EXAM AWS CERTIFIED SOLUTIONS ARCHITECH")
+    st.title("Gerador de Perguntas e Respostas")
 
     # Definindo o caminho para o diretório local onde o arquivo JSON está
     json_file = os.path.join("all_questions.json")
