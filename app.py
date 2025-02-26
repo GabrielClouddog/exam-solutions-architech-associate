@@ -25,8 +25,8 @@ def display_answer(question):
     if question['suggested_answer']:
         st.write(f"**Resposta sugerida:** {question['suggested_answer']}")
 
-# Função principal para criar a interface com Streamlit
-def main():
+# Função para a página de perguntas e respostas
+def question_page():
     st.title("Gerador de Perguntas e Respostas")
 
     # Definindo o caminho para o diretório local onde o arquivo JSON está
@@ -55,6 +55,61 @@ def main():
 
     else:
         st.error(f"Arquivo JSON não encontrado no caminho: {json_file}")
+
+# Função para a página de download de arquivos
+def download_page():
+    st.title("Download de Arquivos")
+
+    # Lista de arquivos
+    files = [
+        "ai_practitioner_aif_c01.xlsx",
+        "alexa_skill_builder_specialty.xlsx",
+        "big_data_bds.xlsx",
+        "cloud_practitioner.xlsx",
+        "cloud_practitioner_clf_c02.xlsx",
+        "data_analytics_das_c01.xlsx",
+        "data_engineer_dea_c01.xlsx",
+        "database_specialty.xlsx",
+        "developer_associate.xlsx",
+        "developer_associate_dva_c02.xlsx",
+        "devops_engineer_dop_c01.xlsx",
+        "devops_engineer_dop_c02.xlsx",
+        "machine_learning_engineer_mla_c.xlsx",
+        "machine_learning_specialty_mls_.xlsx",
+        "sap_on_aws_pas_c01.xlsx",
+        "security_specialty.xlsx",
+        "security_specialty_scs_c02.xlsx",
+        "solutions_architect_professiona.xlsx",
+        "solutions_architect_saa_c02.xlsx",
+        "solutions_architect_saa_c03.xlsx",
+        "sysops_administrator.xlsx",
+        "sysops_administrator_soa_c02.xlsx",
+        "advanced_networking_ans_c01.xlsx"
+    ]
+    
+    # Criar botões de download para os arquivos
+    for file in files:
+        file_path = os.path.join(os.getcwd(), file)
+        if os.path.exists(file_path):
+            with open(file_path, "rb") as f:
+                st.download_button(
+                    label=f"Exame {file}",
+                    data=f,
+                    file_name=file,
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+        else:
+            st.write(f"Arquivo não encontrado: {file}")
+
+# Função principal para criar a interface com Streamlit
+def main():
+    # Sidebar com opção de navegação entre as páginas
+    page = st.sidebar.radio("Escolha a página", ("Perguntas e Respostas - Solution Architech Associate", "Download de Exames Excel"))
+
+    if page == "Perguntas e Respostas - Solution Architech Associate":
+        question_page()
+    elif page == "Download de Exames Excel":
+        download_page()
 
 if __name__ == "__main__":
     main()
