@@ -3,24 +3,30 @@ import os
 import streamlit as st
 
 # Função para exibir as perguntas com as opções
-def display_question(question):
+def display_question(question, language):
     # Concatenar a pergunta, número e descrição
-    question_text = f"**Q{question['question_number']}:** {question['question']}"
+    if language == "Português":
+        question_text = f"**Q{question['question_number']}:** {question.get('question_pt', question['question'])}"
+    else:
+        question_text = f"**Q{question['question_number']}:** {question['question']}"
     
     # Exibir a pergunta e a descrição no mesmo bloco com o mesmo estilo
     st.markdown(question_text)
     
     # Exibir as opções
     for option in question['options']:
-        st.write(f"{option['option']} {option['text']}")
+        option_text = option.get('text_pt', option['text']) if language == "Português" else option['text']
+        st.write(f"{option['option']} {option_text}")
 
     # Exibir o link
     st.write(f"[Link para a questão]({question['url']})")
 
 # Função para exibir a explicação e a resposta
-def display_answer(question):
+def display_answer(question, language):
     st.write(f"**Resposta correta:** {question['selected_answer']}")
-    st.write(f"**Explicação:** {question['explanation']}")
+    
+    explanation = question.get('explanation_pt', question['explanation']) if language == "Português" else question['explanation']
+    st.write(f"**Explicação:** {explanation}")
     
     if question['suggested_answer']:
         st.write(f"**Resposta sugerida:** {question['suggested_answer']}")
@@ -28,6 +34,9 @@ def display_answer(question):
 # Função para a página de perguntas e respostas
 def question_page():
     st.title("Gerador de Perguntas e Respostas")
+
+    # Seleção de idioma
+    language = st.sidebar.radio("Idioma", ["Português", "English"])
 
     # Definindo o caminho para o diretório local onde o arquivo JSON está
     json_file = os.path.join("all_questions.json")
@@ -45,13 +54,25 @@ def question_page():
         # Encontrando a pergunta selecionada
         selected_question = next((q for q in questions if q['question_number'] == selected_question_number), None)
 
+        # Variável de controle para a questão atual
+        if 'current_question' not in st.session_state:
+            st.session_state.current_question = selected_question_number
+
         # Exibindo a pergunta selecionada
         if selected_question:
-            display_question(selected_question)
+            current_question = next((q for q in questions if q['question_number'] == st.session_state.current_question), None)
+            display_question(current_question, language)
 
             # Mostrar resposta e explicação ao clicar no botão
-            if st.button(f"Mostrar resposta para Q{selected_question_number}"):
-                display_answer(selected_question)
+            if st.button(f"Mostrar resposta para Q{current_question['question_number']}"):
+                display_answer(current_question, language)
+
+            # Botão para passar para a próxima questão
+            if st.button("Próxima questão"):
+                current_index = question_numbers.index(st.session_state.current_question)
+                if current_index < len(question_numbers) - 1:
+                    st.session_state.current_question = question_numbers[current_index + 1]
+                    st.experimental_rerun()
 
     else:
         st.error(f"Arquivo JSON não encontrado no caminho: {json_file}")
