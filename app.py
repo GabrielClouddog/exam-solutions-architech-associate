@@ -49,30 +49,34 @@ def question_page():
 
         # Sidebar: lista de botões para cada pergunta
         question_numbers = [question['question_number'] for question in questions]
-        selected_question_number = st.sidebar.selectbox("Escolha uma pergunta", question_numbers)
+        
+        # Usando session_state para armazenar o número da pergunta selecionada
+        if 'current_question' not in st.session_state:
+            st.session_state.current_question = question_numbers[0]  # Inicializa com a primeira pergunta
+        selected_question_number = st.sidebar.selectbox(
+            "Escolha uma pergunta", question_numbers, index=question_numbers.index(st.session_state.current_question)
+        )
+
+        # Atualiza o número da questão selecionada no session_state
+        st.session_state.current_question = selected_question_number
 
         # Encontrando a pergunta selecionada
-        selected_question = next((q for q in questions if q['question_number'] == selected_question_number), None)
-
-        # Variável de controle para a questão atual
-        if 'current_question' not in st.session_state:
-            st.session_state.current_question = selected_question_number
+        selected_question = next((q for q in questions if q['question_number'] == st.session_state.current_question), None)
 
         # Exibindo a pergunta selecionada
         if selected_question:
-            current_question = next((q for q in questions if q['question_number'] == st.session_state.current_question), None)
-            display_question(current_question, language)
+            display_question(selected_question, language)
 
             # Mostrar resposta e explicação ao clicar no botão
-            if st.button(f"Mostrar resposta para Q{current_question['question_number']}"):
-                display_answer(current_question, language)
+            if st.button(f"Mostrar resposta para Q{selected_question_number}"):
+                display_answer(selected_question, language)
 
             # Botão para passar para a próxima questão
             if st.button("Próxima questão"):
                 current_index = question_numbers.index(st.session_state.current_question)
                 if current_index < len(question_numbers) - 1:
                     st.session_state.current_question = question_numbers[current_index + 1]
-                    # st.experimental_rerun()
+                    st.experimental_rerun()
 
     else:
         st.error(f"Arquivo JSON não encontrado no caminho: {json_file}")
