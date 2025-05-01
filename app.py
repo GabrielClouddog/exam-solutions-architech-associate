@@ -72,7 +72,7 @@ def question_page():
                 current_index = question_numbers.index(st.session_state.current_question)
                 if current_index < len(question_numbers) - 1:
                     st.session_state.current_question = question_numbers[current_index + 1]
-                    st.experimental_rerun()
+                    # st.experimental_rerun()
 
     else:
         st.error(f"Arquivo JSON não encontrado no caminho: {json_file}")
